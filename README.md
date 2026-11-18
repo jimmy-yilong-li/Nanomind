@@ -1,81 +1,91 @@
-# NANOMIND Code
+<div align="center">
 
-## Intro
+# NanoMind
 
-NANOMIND is a multimodal on-device inference framework for small, battery-powered systems.
+### Tiny but Mighty: A Software-Hardware Co-Design Approach for<br>Efficient Multimodal Inference on Battery-Powered Small Devices
 
-The project focuses on a software-hardware co-design approach for running multimodal AI workloads efficiently on resource-constrained edge devices. Instead of treating the full stack as a monolithic model invocation, NANOMIND is built around modular execution, heterogeneous accelerator usage, and low-power runtime design.
+**ICLR 2026**
 
-## Background
+<p>Yilong Li<sup>1</sup>, Shuai Zhang<sup>2</sup>, Yijing Zeng<sup>1</sup>, Chengpo Yan<sup>1</sup>, Hao Zhang<sup>1</sup>,<br>Xinmiao Xiong<sup>1</sup>, Jingyu Liu<sup>1</sup>, Pan Hu<sup>3</sup>, Suman Banerjee<sup>1</sup></p>
 
-Modern multimodal systems are increasingly expected to run directly on edge devices for privacy, responsiveness, and offline operation. In practice, however, small devices are constrained by power, memory, and heterogeneous hardware limits.
+<sup>1</sup>University of Wisconsin&ndash;Madison &nbsp; <sup>2</sup>Amazon Web Services AI &nbsp; <sup>3</sup>Uber
 
-NANOMIND explores a practical system design for this setting:
+<p>
+  <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/b20260e3e1bd7ea108831925d65ce0a6-Abstract-Conference.html"><img src="https://img.shields.io/badge/ICLR_2026-Paper-17324d?style=flat-square" alt="ICLR 2026 paper"></a>
+  <a href="https://proceedings.iclr.cc/paper_files/paper/2026/file/b20260e3e1bd7ea108831925d65ce0a6-Paper-Conference.pdf"><img src="https://img.shields.io/badge/Read-PDF-526879?style=flat-square" alt="Read the conference PDF"></a>
+  <a href="https://arxiv.org/abs/2510.05109"><img src="https://img.shields.io/badge/arXiv-2510.05109-b31b1b?style=flat-square" alt="arXiv preprint"></a>
+  <a href="https://github.com/jimmy-yilong-li/CrossInfer"><img src="https://img.shields.io/badge/Latest_code-CrossInfer-087e8b?style=flat-square&logo=github&logoColor=white" alt="Latest code in CrossInfer"></a>
+</p>
 
-- modular multimodal inference,
-- cross-accelerator scheduling,
-- unified-memory-aware execution,
-- hardware-software co-design,
-- low-power and battery-aware deployment.
+**Multimodal intelligence on a small, battery-powered device. Entirely offline.**
 
-## Paper
+</div>
 
-- **Tiny but Mighty: A Software-Hardware Co-Design Approach for Efficient Multimodal Inference on Battery-Powered Small Devices**
-- Published at **ICLR 2026**
-- Local PDF: [`tinyLLM.pdf`](./tinyLLM.pdf)
-- Public paper/project link: **to be added**
+> [!IMPORTANT]
+> **NanoMind's latest implementation and code have been merged into [CrossInfer](https://github.com/jimmy-yilong-li/CrossInfer).**
+> Visit CrossInfer for the current implementation and ongoing development. This repository retains the NanoMind paper and earlier model assets.
 
-## Repository Status
+<p align="center">
+  <img src="assets/nanomind-device.png" width="800" alt="NanoMind prototype with a camera, microphone, speaker, and battery module">
+  <br>
+  <sub>The NanoMind prototype: camera and audio interfaces alongside a battery-powered compute board. Figure 11 of the ICLR paper.</sub>
+</p>
 
-This repository is **still being organized for public release**.
+## Overview
 
-It is not yet the full open-source release of the internal research codebase. The current goal of this public repository is to:
+NanoMind co-designs software and hardware to run multimodal LLMs on small devices. Rather than execute an entire model on one accelerator, it separates vision, projection, language, and audio into independently executable modules. Each module runs on a suitable compute engine, with shared-memory embedding transfer connecting the stages.
 
-1. provide the paper and project context,
-2. publish the model assets and reusable components that can be shared cleanly,
-3. gradually build toward a proper public-facing code release.
+<p align="center">
+  <img src="assets/nanomind-overview.png" width="900" alt="NanoMind workflow: NPU vision encoding, TABM zero-copy ring buffer, GPU language inference, and CPU power-aware scheduling">
+  <br>
+  <sub>Module-level heterogeneous execution with zero-copy embedding transfer. Figure 1 of the ICLR paper.</sub>
+</p>
 
-The private development repository and the public GitHub repository are intentionally kept separate.
+### What Makes It Work
 
-## Current Public Contents
+| Modular execution | Zero-copy communication | Battery-aware co-design |
+| :--- | :--- | :--- |
+| Map model components to suitable CPU, GPU, and NPU engines. | TABM coordinates embedding ownership through a shared ring buffer, avoiding intermediate copies. | Combine low-bit kernels, power-aware scheduling, and a compact hardware prototype. |
 
-At the moment, this repository contains:
+## Selected Results
 
-- [`tinyLLM.pdf`](./tinyLLM.pdf): the paper,
-- [`models/`](./models): model assets that are currently ready to share publicly.
+<table>
+  <tr>
+    <th align="center" width="33%">Energy</th>
+    <th align="center" width="33%">Latency</th>
+    <th align="center" width="33%">Battery Life</th>
+  </tr>
+  <tr>
+    <td align="center"><h2>42.3% lower</h2>End-to-end energy</td>
+    <td align="center"><h2>36.2% lower</h2>End-to-end latency</td>
+    <td align="center"><h2>18.8 hours</h2>On-demand operation</td>
+  </tr>
+  <tr>
+    <td>Against the edge frameworks and development kits evaluated in the paper.</td>
+    <td>Versus Orange Pi 5 Ultra with RKLLM, using 4-bit Qwen2-VL-2B on InfoVQA.</td>
+    <td>LLaVA-OneVision-Qwen2-0.5B with a camera and a 2,000 mAh battery, in low-duty-cycle mode.</td>
+  </tr>
+</table>
 
-More code, documentation, and reproducible components will be added as the repository is cleaned up.
+These are distinct comparisons from the [ICLR 2026 paper](https://proceedings.iclr.cc/paper_files/paper/2026/file/b20260e3e1bd7ea108831925d65ce0a6-Paper-Conference.pdf), not measurements from a single configuration. Battery life refers to on-demand operation, not continuous inference.
 
-## Models
+## Code and Resources
 
-The [`models/`](./models) directory currently includes selected runtime model assets used by the `Nanomind_Virgile` stack:
+- **[CrossInfer](https://github.com/jimmy-yilong-li/CrossInfer)**: the home of the latest implementation and code.
+- **[ICLR paper](https://proceedings.iclr.cc/paper_files/paper/2026/file/b20260e3e1bd7ea108831925d65ce0a6-Paper-Conference.pdf)**: system design, hardware prototype, and evaluation.
+- **[Earlier model assets](models/)**: the original repository's reference assets, retained here for continuity.
 
-- `models/yolo/yolo11n_int8.rknn`
-- `models/clip/clip_images.rknn`
-- `models/clip/clip_text.rknn`
-- `models/insightface/scrfd_2.5g_bnkps_renamed.onnx`
-- `models/insightface/r18_glint360k.onnx`
-- `models/insightface/Gundam_RK356X.tar.gz`
+## Citation
 
-These are included as reference/runtime assets for the current public snapshot.
-
-### Model Status Notes
-
-- **YOLO / CLIP / InsightFace runtime assets**: included in this public snapshot.
-- **LLM base model assets**: still being organized for public release.
-- **Qwen-related base model packaging**: not published here yet.
-
-## Intended Direction
-
-This repository will eventually focus on the publicly shareable parts of the NANOMIND system, including:
-
-- edge multimodal inference building blocks,
-- deployment-oriented runtime components,
-- selected model packaging,
-- documentation for reproducing core ideas from the paper.
-
-## Disclaimer
-
-This repository is still under construction.
-
-Interfaces, directory structure, included assets, and documentation may change as the public release is assembled.
+```bibtex
+@inproceedings{li2026tiny,
+  title     = {Tiny but Mighty: A Software-Hardware Co-Design Approach for
+               Efficient Multimodal Inference on Battery-Powered Small Devices},
+  author    = {Yilong Li and Shuai Zhang and Yijing Zeng and Chengpo Yan and
+               Hao Zhang and Xinmiao Xiong and Jingyu Liu and Pan Hu and
+               Suman Banerjee},
+  booktitle = {The Fourteenth International Conference on Learning Representations},
+  year      = {2026},
+  url       = {https://proceedings.iclr.cc/paper_files/paper/2026/hash/b20260e3e1bd7ea108831925d65ce0a6-Abstract-Conference.html}
+}
+```
